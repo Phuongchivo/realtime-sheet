@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Bảng dữ liệu Sheet1</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      margin: 0;
+    }
+    h2 {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 0px;
+      margin-bottom: 10px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f44336;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div id="table-container">Đang tải dữ liệu...</div>
+
+  <script>
+    const sheetAPI = "https://script.google.com/macros/s/AKfycby9aj1vvG4WT1G0VsK8y96fGwo6dCraTn-4KrSKz8igmxilXHtxgduTua-fhGD40rhRJA/exec";
+
+    async function loadTable() {
+      try {
+        const response = await fetch(sheetAPI);
+        const data = await response.json();
+
+        let html = '<table><thead><tr>';
+        data.sheet1_data[0].forEach(col => html += `<th>${col}</th>`);
+        html += '</tr></thead><tbody>';
+
+        for (let i = 1; i < data.sheet1_data.length; i++) {
+          html += '<tr>';
+          data.sheet1_data[i].forEach((cell, j) => {
+            // Nếu là cột cuối cùng → định dạng ngày giờ
+            if (j === data.sheet1_data[0].length - 1 && cell !== "" && typeof cell === "string") {
+              const date = new Date(cell);
+              if (!isNaN(date)) {
+                const formatted = date.toLocaleString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                });
+                html += `<td>${formatted}</td>`;
+              } else {
+                html += `<td>${cell}</td>`;
+              }
+            } else {
+              html += `<td>${cell}</td>`;
+            }
+          });
+          html += '</tr>';
+        }
+
+        html += '</tbody></table>';
+        document.getElementById("table-container").innerHTML = html;
+      } catch (err) {
+        document.getElementById("table-container").innerText = "Không thể tải dữ liệu.";
+        console.error("Lỗi:", err);
+      }
+    }
+
+    loadTable();
+    setInterval(loadTable, 5000);
+  </script>
+</body>
+</html>
