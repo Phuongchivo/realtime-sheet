@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hiển thị A2 và C2</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px 10px; /* 🔽 GIẢM lề trên và dưới, giữ hai bên thoáng */
+      margin: 0;
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 140px; /* 🔼 TĂNG khoảng cách giữa các cột A2 – 150 – C2 */
+      text-align: center;
+      margin-bottom: 10px; /* 🔽 GIẢM khoảng cách dưới toàn khối */
+    }
+
+    .cell .value {
+      font-size: 40px;         /* 🔼 CỠ CHỮ lớn cho giá trị */
+      font-weight: bold;
+      color: #c62828;          /* 🔴 MÀU ĐỎ nổi bật */
+      line-height: 1.1;        /* 🔽 GIẢM khoảng cách dòng giữa value và label */
+      margin-bottom: 5px;      /* 🔽 Khoảng cách nhỏ giữa giá trị và nhãn */
+    }
+
+    .cell .label {
+      font-size: 23px;         /* CỠ CHỮ nhãn rõ ràng nhưng nhỏ hơn giá trị */
+      color: #000000;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Khối hiển thị giá trị A2, 150 (cứng), C2 -->
+  <div class="row">
+    <div class="cell">
+      <div class="value" id="a2">...</div>
+      <div class="label">Đại biểu có mặt</div>
+    </div>
+    <div class="cell">
+      <div class="value">150</div> <!-- 👈 Hiển thị cố định -->
+      <div class="label">Tổng số đại biểu</div>
+    </div>
+    <div class="cell">
+      <div class="value" id="c2">...</div>
+      <div class="label">Tỉ lệ tham dự</div>
+    </div>
+  </div>
+
+  <script>
+    const sheetAPI = "https://script.google.com/macros/s/AKfycby9aj1vvG4WT1G0VsK8y96fGwo6dCraTn-4KrSKz8igmxilXHtxgduTua-fhGD40rhRJA/exec";
+
+    async function fetchData() {
+      try {
+        const response = await fetch(sheetAPI);
+        const data = await response.json();
+
+        document.getElementById("a2").innerText = data.a2_value;
+
+        const c2Value = parseFloat(data.c2_value);
+        const c2Formatted = isNaN(c2Value) ? "..." : `${(c2Value * 100).toFixed(2)}%`;
+        document.getElementById("c2").innerText = c2Formatted;
+
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000);
+  </script>
+</body>
+</html>
